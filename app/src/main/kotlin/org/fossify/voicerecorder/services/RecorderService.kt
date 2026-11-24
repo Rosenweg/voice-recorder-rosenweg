@@ -252,6 +252,17 @@ class RecorderService : Service() {
 
     private fun recordingSavedSuccessfully(savedUri: Uri) {
         toast(R.string.recording_saved_successfully)
+        // Rosenweg: Aufnahme in den persoenlichen Ordner der Nextcloud (Persönlich/Diktiergerät/<Monat>).
+        // Ohne Anmeldung wartet sie in der Warteschlange. Lokal bleibt sie vorerst liegen.
+        try {
+            ch.rosenweg4303.cloud.Hochladen.einreihen(
+                this, savedUri,
+                ch.rosenweg4303.cloud.Hochladen.ziel("Diktiergerät", recordingPath.getFilenameFromPath()),
+                lokalLoeschen = false, mime = recordingPath.getMimeType()
+            )
+        } catch (e: Exception) {
+            showErrorToast(e)
+        }
         EventBus.getDefault().post(Events.RecordingSaved(savedUri))
     }
 

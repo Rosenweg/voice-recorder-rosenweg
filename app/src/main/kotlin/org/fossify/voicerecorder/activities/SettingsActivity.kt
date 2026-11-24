@@ -67,6 +67,7 @@ class SettingsActivity : SimpleActivity() {
         setupLanguage()
         setupChangeDateTimeFormat()
         setupSaveRecordingsFolder()
+        setupNextcloud()
         setupFilenamePattern()
         setupExtension()
         setupBitrate()
@@ -132,6 +133,19 @@ class SettingsActivity : SimpleActivity() {
     private fun setupChangeDateTimeFormat() {
         binding.settingsChangeDateTimeFormatHolder.setOnClickListener {
             ChangeDateTimeFormatDialog(this) {}
+        }
+    }
+
+    /** Rosenweg: Anmeldung an der Nextcloud, damit Aufnahmen hochgeladen werden. */
+    private fun setupNextcloud() {
+        val konto = ch.rosenweg4303.cloud.KontoSpeicher(this).laden()
+        binding.settingsNextcloud.text = if (konto == null) {
+            getString(R.string.rw_nextcloud_aus)
+        } else {
+            getString(R.string.rw_nextcloud_an, konto.benutzer)
+        }
+        binding.settingsNextcloudHolder.setOnClickListener {
+            startActivity(android.content.Intent(this, ch.rosenweg4303.cloud.AnmeldenActivity::class.java))
         }
     }
 

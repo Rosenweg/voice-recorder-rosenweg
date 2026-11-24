@@ -139,6 +139,7 @@ detekt {
 
 dependencies {
     implementation(libs.fossify.commons)
+    implementation(libs.rosenweg.cloud) // Rosenweg: selbst in die Nextcloud hochladen
     implementation(libs.eventbus)
     implementation(libs.audiorecordview)
     implementation(libs.androidx.documentfile)
