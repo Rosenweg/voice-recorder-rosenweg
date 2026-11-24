@@ -126,6 +126,12 @@ fun Context.hasRecordings(): Boolean {
 }
 
 fun Context.getAllRecordings(trashed: Boolean = false): ArrayList<Recording> {
+    val lokal = getAllRecordingsLokal(trashed)
+    // Rosenweg: hochgeladene Aufnahmen aus der Nextcloud dazu (nicht im Papierkorb)
+    return if (trashed) lokal else mitNextcloud(lokal)
+}
+
+private fun Context.getAllRecordingsLokal(trashed: Boolean): ArrayList<Recording> {
     return if (nutztSaf()) {
         val recordings = arrayListOf<Recording>()
         recordings.addAll(getRecordings(trashed))

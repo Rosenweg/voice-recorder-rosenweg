@@ -1,5 +1,7 @@
 package org.fossify.voicerecorder.adapters
 
+import org.fossify.commons.extensions.showErrorToast
+import org.fossify.voicerecorder.extensions.teilbarePfade
 import android.annotation.SuppressLint
 import android.view.Menu
 import android.view.View
@@ -126,19 +128,37 @@ class RecordingsAdapter(
 
     private fun openRecordingWith() {
         val recording = getItemWithKey(selectedKeys.first()) ?: return
-        val path = recording.path
-        activity.openPathIntent(
-            path = path,
-            forceChooser = true,
-            applicationId = BuildConfig.APPLICATION_ID,
-            forceMimeType = "audio/*"
-        )
+        // Rosenweg: Nextcloud-Aufnahmen vorher in den Cache laden
+        ensureBackgroundThread {
+            val path = try {
+                activity.teilbarePfade(listOf(recording)).first()
+            } catch (e: Exception) {
+                activity.showErrorToast(e)
+                return@ensureBackgroundThread
+            }
+            activity.runOnUiThread {
+                activity.openPathIntent(
+                    path = path,
+                    forceChooser = true,
+                    applicationId = BuildConfig.APPLICATION_ID,
+                    forceMimeType = "audio/*"
+                )
+            }
+        }
     }
 
     private fun shareRecordings() {
         val selectedItems = getSelectedItems()
-        val paths = selectedItems.map { it.path }
-        activity.sharePathsIntent(paths, BuildConfig.APPLICATION_ID)
+        // Rosenweg: Nextcloud-Aufnahmen vorher in den Cache laden
+        ensureBackgroundThread {
+            val paths = try {
+                activity.teilbarePfade(selectedItems)
+            } catch (e: Exception) {
+                activity.showErrorToast(e)
+                return@ensureBackgroundThread
+            }
+            activity.runOnUiThread { activity.sharePathsIntent(paths, BuildConfig.APPLICATION_ID) }
+        }
     }
 
     private fun askConfirmDelete() {
