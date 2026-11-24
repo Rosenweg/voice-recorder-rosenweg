@@ -69,6 +69,8 @@ class MainActivity : SimpleActivity() {
         handlePermission(PERMISSION_RECORD_AUDIO) {
             if (it) {
                 tryInitVoiceRecorder()
+                // Rosenweg: beim ersten Start auf die Nextcloud hinweisen (ablehnen moeglich)
+                if (savedInstanceState == null) ch.rosenweg4303.cloud.Hinweis.beimErstenStart(this, "Deine Aufnahmen")
             } else {
                 toast(org.fossify.commons.R.string.no_audio_permissions)
                 finish()
