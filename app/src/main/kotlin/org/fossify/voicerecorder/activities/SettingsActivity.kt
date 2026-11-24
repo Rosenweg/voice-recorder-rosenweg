@@ -150,6 +150,10 @@ class SettingsActivity : SimpleActivity() {
     }
 
     private fun setupSaveRecordingsFolder() {
+        // Rosenweg: Ordner ist fest vorgegeben
+        binding.settingsSaveRecordingsHolder.beGone()
+        if (true) return
+
         binding.settingsSaveRecordingsLabel.text =
             getString(R.string.save_recordings_in)
         binding.settingsSaveRecordings.text = humanizePath(config.saveRecordingsFolder)

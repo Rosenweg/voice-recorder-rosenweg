@@ -30,7 +30,7 @@ fun Activity.setKeepScreenAwake(keepScreenOn: Boolean) {
 }
 
 fun BaseSimpleActivity.ensureStoragePermission(callback: (result: Boolean) -> Unit) {
-    if (isRPlus() && !hasProperStoredFirstParentUri(config.saveRecordingsFolder)) {
+    if (nutztSaf() && !hasProperStoredFirstParentUri(config.saveRecordingsFolder)) {
         StoragePermissionDialog(this) {
             launchFolderPicker(config.saveRecordingsFolder) { newPath ->
                 if (!newPath.isNullOrEmpty()) {
@@ -80,7 +80,7 @@ fun BaseSimpleActivity.deleteRecordings(
     callback: (success: Boolean) -> Unit
 ) {
     ensureBackgroundThread {
-        if (isRPlus()) {
+        if (nutztSaf()) {
             val resolver = contentResolver
             recordingsToRemove.forEach {
                 DocumentsContract.deleteDocument(resolver, it.path.toUri())
@@ -122,7 +122,7 @@ fun BaseSimpleActivity.moveRecordings(
     destinationParent: String,
     callback: (success: Boolean) -> Unit
 ) {
-    if (isRPlus()) {
+    if (nutztSaf(sourceParent)) {
         moveRecordingsSAF(
             recordings = recordingsToMove,
             sourceParent = sourceParent,

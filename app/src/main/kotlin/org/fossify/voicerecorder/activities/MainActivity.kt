@@ -29,6 +29,7 @@ import org.fossify.voicerecorder.BuildConfig
 import org.fossify.voicerecorder.R
 import org.fossify.voicerecorder.adapters.ViewPagerAdapter
 import org.fossify.voicerecorder.databinding.ActivityMainBinding
+import org.fossify.voicerecorder.extensions.nutztSaf
 import org.fossify.voicerecorder.extensions.config
 import org.fossify.voicerecorder.extensions.deleteExpiredTrashedRecordings
 import org.fossify.voicerecorder.extensions.ensureStoragePermission
@@ -166,7 +167,10 @@ class MainActivity : SimpleActivity() {
     }
 
     private fun tryInitVoiceRecorder() {
-        if (isRPlus()) {
+        if (isRPlus() && !nutztSaf()) {
+            // Rosenweg: eigener App-Ordner, keine Freigabe noetig
+            setupViewPager()
+        } else if (isRPlus()) {
             ensureStoragePermission { granted ->
                 if (granted) {
                     setupViewPager()

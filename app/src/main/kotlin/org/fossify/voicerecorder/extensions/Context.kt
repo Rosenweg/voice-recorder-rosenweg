@@ -79,6 +79,25 @@ fun Context.getOrCreateTrashFolder(): String {
 }
 
 fun Context.getDefaultRecordingsFolder(): String {
+    // Rosenweg: Standard ist der eigene App-Ordner. Aufnahmen gehen in die Nextcloud
+    // und werden danach geloescht; dafuer braucht es keine Ordnerfreigabe (SAF).
+    return appAufnahmeOrdner()
+}
+
+/** Rosenweg: eigener App-Ordner fuer Aufnahmen (ohne Freigabe, faellt beim Abmelden weg). */
+fun Context.appAufnahmeOrdner(): String = File(getExternalFilesDir(null), "Aufnahmen").absolutePath
+
+/**
+ * Rosenweg: SAF nur fuer Ordner ausserhalb des eigenen App-Ordners (ab Android 11).
+ * Im App-Ordner geht es ueber normale Dateien.
+ */
+fun Context.nutztSaf(pfad: String = config.saveRecordingsFolder): Boolean {
+    val eigen = getExternalFilesDir(null)?.absolutePath ?: return isRPlus()
+    return isRPlus() && !pfad.startsWith(eigen)
+}
+
+@Suppress("unused")
+fun Context.getStandardRecordingsFolderUpstream(): String {
     val defaultPath = getDefaultRecordingsRelativePath()
     return "$internalStoragePath/$defaultPath"
 }
@@ -93,7 +112,7 @@ fun Context.getDefaultRecordingsRelativePath(): String {
 
 fun Context.hasRecordings(): Boolean {
     val recordingsFolder = config.saveRecordingsFolder
-    return if (isRPlus()) {
+    return if (nutztSaf(recordingsFolder)) {
         getDocumentSdk30(recordingsFolder)
             ?.listFiles()
             ?.any { it.isAudioRecording() }
@@ -107,7 +126,7 @@ fun Context.hasRecordings(): Boolean {
 }
 
 fun Context.getAllRecordings(trashed: Boolean = false): ArrayList<Recording> {
-    return if (isRPlus()) {
+    return if (nutztSaf()) {
         val recordings = arrayListOf<Recording>()
         recordings.addAll(getRecordings(trashed))
         if (trashed) {

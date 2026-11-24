@@ -2,5 +2,5 @@
 <resources>
     <string name="rw_nextcloud">Rosenweg-Nextcloud</string>
     <string name="rw_nextcloud_aus">Nicht angemeldet – Aufnahmen bleiben nur auf dem Telefon</string>
-    <string name="rw_nextcloud_an">%s – Aufnahmen gehen nach Persönlich/Diktiergerät</string>
+    <string name="rw_nextcloud_an">%s – Aufnahmen gehen nach Persönlich/Diktiergerät und werden danach vom Telefon gelöscht</string>
 </resources>

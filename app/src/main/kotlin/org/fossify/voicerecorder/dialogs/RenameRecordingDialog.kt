@@ -16,6 +16,7 @@ import org.fossify.commons.extensions.value
 import org.fossify.commons.helpers.ensureBackgroundThread
 import org.fossify.commons.helpers.isRPlus
 import org.fossify.voicerecorder.databinding.DialogRenameRecordingBinding
+import org.fossify.voicerecorder.extensions.nutztSaf
 import org.fossify.voicerecorder.extensions.config
 import org.fossify.voicerecorder.models.Events
 import org.fossify.voicerecorder.models.Recording
@@ -56,7 +57,7 @@ class RenameRecordingDialog(
                         }
 
                         ensureBackgroundThread {
-                            if (isRPlus()) {
+                            if (activity.nutztSaf()) {
                                 renameRecording(recording, newTitle)
                             } else {
                                 renameRecordingLegacy(recording, newTitle)
