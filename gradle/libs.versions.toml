@@ -15,7 +15,7 @@ eventbus = "3.3.1"
 #Fossify
 #noinspection GradleDependency
 commons = "7.1.3-rosenweg.1"
-rosenwegCloud = "0.5.1"
+rosenwegCloud = "0.6.0"
 #AudioRecordView
 audiorecordview = "1.0.5"
 #TAndroidLame
