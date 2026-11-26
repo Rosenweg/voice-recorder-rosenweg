@@ -27,7 +27,6 @@ runs:
                 name = 'MavenCentralSpiegel'
                 url = 'https://maven-central.storage-download.googleapis.com/maven2/'
                 content {
-                    excludeGroupByRegex 'com\\.github\\..*'
                     excludeGroup 'ch.rosenweg4303'
                     excludeGroupByRegex 'androidx\\..*'
                     excludeGroupByRegex 'com\\.android\\..*'
@@ -56,8 +55,9 @@ runs:
                 spiegel(h)
             }
         }
-        // JitPack-Gruppen (com.github.*) und Rosenweg-Pakete nie bei Maven Central suchen: dort gibt
-        // es sie nicht, und eine 429-Antwort auf die Suche bricht das Aufloesen ab.
+        // JitPack-Gruppen (com.github.*) und Rosenweg-Pakete nicht bei repo.maven.apache.org suchen:
+        // eine 429-Antwort auf die Suche bricht das Aufloesen ab. Was es von com.github.* wirklich
+        // auf Maven Central gibt (z.B. Glide), liefert der Spiegel, der vorher gefragt wird.
         settingsEvaluated { settings ->
             def filtern = { repos ->
                 repos.withType(MavenArtifactRepository).configureEach { r ->
