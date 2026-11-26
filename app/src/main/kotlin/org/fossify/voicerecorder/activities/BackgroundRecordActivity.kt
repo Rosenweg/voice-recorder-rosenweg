@@ -12,6 +12,13 @@ class BackgroundRecordActivity : SimpleActivity() {
 
     override fun onResume() {
         super.onResume()
+        // Rosenweg: Aufnehmen ueber das Widget erst nach der Anmeldung (eigenes Handy) - die App oeffnen,
+        // dort kommt der Anmeldeschirm
+        if (ch.rosenweg4303.cloud.RosenwegAnmeldung.anmeldungNoetig(this)) {
+            startActivity(Intent(this, MainActivity::class.java))
+            finish()
+            return
+        }
         if (intent.action == RECORD_INTENT_ACTION) {
             handleNotificationPermission { granted ->
                 if (granted) {

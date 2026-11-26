@@ -48,6 +48,9 @@ class MainActivity : SimpleActivity() {
 
     private lateinit var binding: ActivityMainBinding
 
+    /** Rosenweg: Start wartet auf die Anmeldung (Wert: erster Start), wird in onResume nachgeholt. */
+    private var rosenwegStartOffen: Boolean? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
@@ -66,21 +69,30 @@ class MainActivity : SimpleActivity() {
             deleteExpiredTrashedRecordings()
         }
 
+        bus = EventBus.getDefault()
+        bus!!.register(this)
+        // Rosenweg: ohne Anmeldung (eigenes Handy) erst nach dem Anmeldeschirm, siehe onResume
+        if (ch.rosenweg4303.cloud.RosenwegAnmeldung.anmeldungNoetig(this)) {
+            rosenwegStartOffen = savedInstanceState == null
+        } else {
+            starten(savedInstanceState == null)
+        }
+    }
+
+    private fun starten(ersterStart: Boolean) {
         handlePermission(PERMISSION_RECORD_AUDIO) {
             if (it) {
                 tryInitVoiceRecorder()
                 // Rosenweg: beim ersten Start auf die Nextcloud hinweisen (ablehnen moeglich)
-                if (savedInstanceState == null) ch.rosenweg4303.cloud.Hinweis.beimErstenStart(this, "Deine Aufnahmen")
+                if (ersterStart) ch.rosenweg4303.cloud.Hinweis.beimErstenStart(this, "Deine Aufnahmen")
                 // Rosenweg: persoenliche Einstellungen aus der Nextcloud (und Aenderungen dorthin)
-                if (savedInstanceState == null) ch.rosenweg4303.cloud.Einstellungen.abgleichen(this) { recreate() }
+                if (ersterStart) ch.rosenweg4303.cloud.Einstellungen.abgleichen(this) { recreate() }
             } else {
                 toast(org.fossify.commons.R.string.no_audio_permissions)
                 finish()
             }
         }
 
-        bus = EventBus.getDefault()
-        bus!!.register(this)
         if (config.recordAfterLaunch && !RecorderService.isRunning) {
             Intent(this@MainActivity, RecorderService::class.java).apply {
                 try {
@@ -93,6 +105,14 @@ class MainActivity : SimpleActivity() {
 
     override fun onResume() {
         super.onResume()
+        // Rosenweg (Stefan 26.11.2026): auf dem eigenen Handy ist die App ohne Anmeldung nicht nutzbar,
+        // es kommt der gemeinsame Anmeldeschirm (commons-rosenweg: Karte oder Rosenweg-Konto, "Zurueck"
+        // schliesst die App). Geteilte Telefone (Rosenweg Geraet): nie, dort gilt dessen Anmeldung.
+        if (ch.rosenweg4303.cloud.RosenwegAnmeldeSchirm.zeigenFallsNoetig(this)) return
+        rosenwegStartOffen?.let {
+            rosenwegStartOffen = null
+            starten(it)
+        }
         updateMenuColors()
         if (getPagerAdapter()?.showRecycleBin != config.useRecycleBin) {
             setupViewPager()
