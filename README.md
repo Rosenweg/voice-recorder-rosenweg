@@ -1,53 +1,38 @@
-# Fossify Voice Recorder
+# Rosenweg Diktiergerät
 
-<img alt="Logo" src="graphics/icon.webp" width="120" />
+Diktiergerät für die Smartphones der Siedlung Rosenweg in Kaiseraugst. Aufnahmen gehen in die Rosenweg-Nextcloud der Person (`Persönlich/Diktiergerät`) und werden auf dem Telefon gelöscht, sobald sie oben sind.
 
-<a href="https://play.google.com/store/apps/details?id=org.fossify.voicerecorder"><img alt='Get it on Google Play' src='https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png' height=80/></a> <a href="https://f-droid.org/packages/org.fossify.voicerecorder/"><img src="https://fdroid.gitlab.io/artwork/badge/get-it-on-en.svg" alt="Get it on F-Droid" height=80/></a> <a href="https://apt.izzysoft.de/fdroid/index/apk/org.fossify.voicerecorder"><img src="https://gitlab.com/IzzyOnDroid/repo/-/raw/master/assets/IzzyOnDroid.png" alt="Get it on IzzyOnDroid" height=80/></a>
+## Im Rosenweg
 
-Introducing Fossify Voice Recorder – where capturing crystal-clear audio and preserving precious moments is effortless and enjoyable. Seamlessly blend
-simplicity with functionality as you embark on a journey of seamless recording experiences tailored to your needs.
+- Der Speicherordner ist fest vorgegeben (eigener App-Ordner); die Einstellung "Speichern in" ist ausgeblendet.
+- Der Player zeigt lokale (noch nicht hochgeladene) Aufnahmen und die aus der Nextcloud; Nextcloud-Aufnahmen werden gestreamt und lassen sich löschen, umbenennen und teilen.
+- **Rosenweg-Nextcloud:** Anmeldung über den Login der Nextcloud mit dem Rosenweg-Konto im Browser; die App erhält ein eigenes App-Passwort, nie das eigentliche Passwort. Auf geteilten Telefonen kommt der Zugang von Rosenweg Gerät. Hochgeladen wird über eine Warteschlange, sobald Netz da ist; lokal gelöscht wird erst, wenn die Nextcloud den Empfang bestätigt hat. Beim ersten Start fragt die App einmal, ob man sich anmelden möchte ("Nein, danke" wird gemerkt, Anmelden geht weiter über die Einstellungen).
+- **Einstellungen pro Person:** Die Einstellungen der App liegen in der Nextcloud der Person (`Persönlich/.rosenweg/`) und sind auf jedem Telefon wieder da, auf dem sie angemeldet ist. Gerätebezogenes (Widgets, Pfade, Zähler) bleibt auf dem Gerät.
+- **Rosenweg Updater:** Auf Handys ohne Rosenweg Gerät prüft die App den App-Katalog der Telefonanlage und bietet Aktualisierungen für alle installierten Rosenweg-Apps an. Jede APK wird vorher geprüft (Prüfsumme, Paketname, Version, Rosenweg-Signatur); Android lässt jede Installation bestätigen. Auf geteilten Telefonen übernimmt das Rosenweg Gerät.
 
-**🔊 HIGH-QUALITY AUDIO CAPTURE:**  
-Remember every word, every note, and every emotion with pristine audio quality. Fossify Voice Recorder empowers you to capture high-fidelity recordings
-effortlessly, ensuring that every detail is preserved with clarity and precision.
+## Installation
 
-**🎙️ VERSATILE RECORDING OPTIONS:**  
-From voice memos to musical inspirations, this intuitive app transforms your device into a versatile recording studio. Explore the freedom to document your
-surroundings and unleash your creativity with ease.
+- **Geteilte Rosenweg-Telefone:** Rosenweg Gerät installiert die App automatisch aus dem App-Katalog der Telefonanlage und hält sie aktuell.
+- **Eigenes Handy:** APK von [www.rosenweg4303.ch/apps](https://www.rosenweg4303.ch/apps) herunterladen und installieren. Danach hält der Rosenweg Updater die Rosenweg-Apps aktuell.
 
-**🚀 NO-FUSS FUNCTIONALITY:**  
-Enjoy a clutter-free experience with Fossify Voice Recorder. Say goodbye to unnecessary features and hello to a streamlined interface designed for intuitive
-navigation and seamless recording.
+Die App gibt es nicht im Play Store und nicht auf F-Droid. Sie ist mit dem Rosenweg-Schlüssel signiert; Fassungen anderer Herkunft lassen sich nicht darüber installieren.
 
-**📊 INTUITIVE VISUALIZATION:**  
-Immerse yourself in the recording process with real-time sound volume visualization. Experience the thrill of monitoring your recordings with a sleek,
-interactive display that enhances your recording experience.
+## Bauen
 
-**🔒 PRIVACY-FIRST APPROACH:**  
-Rest easy knowing that your privacy is our priority. Fossify Voice Recorder operates offline, ensuring maximum privacy, security, and stability without the need
-for internet access. Your recordings remain confidential and under your control at all times.
+Die App baut gegen den Rosenweg-Fork der Fossify Commons und die Rosenweg-Module `cloud`/`updater` (`ch.rosenweg4303:*`). Diese kommen aus dem lokalen Maven-Repository (`mavenLocal()`), also zuerst [commons-rosenweg](https://github.com/Rosenweg/commons-rosenweg) veröffentlichen:
 
-**🎨 CUSTOMIZABLE INTERFACE:**  
-Personalize your recording experience with customizable colors and themes. Embrace the sleek elegance of material design and dark theme options, offering a
-visually stunning experience tailored to your preferences.
+```bash
+# in commons-rosenweg, Zweig rosenweg
+./gradlew -PVERSION=7.1.3-rosenweg.1 publishToMavenLocal
 
-**🤝 USER-FRIENDLY FEATURES:**  
-Discover intuitive functionalities like customizable filename formats and practical widgets for quick recordings. With Fossify Voice Recorder, the power to
-record is in your hands.
+# in diesem Repo, Zweig rosenweg
+./gradlew assembleFossRelease
+```
 
-**🌐 AD-FREE & OPEN-SOURCE:**  
-Say goodbye to intrusive ads and unnecessary permissions. Fossify Voice Recorder is ad-free, fully open-source, and grants you the freedom to use the app as you
-please, without compromise.
+Die APK liegt danach unter `app/build/outputs/apk/foss/release/`. Signiert wird mit `keystore.properties` (Vorlage: `keystore.properties_sample`); die Datei und der Schlüssel liegen nicht im Repo. Paketname: `ch.rosenweg4303.voicerecorder`.
 
-Capture moments, preserve memories, and unleash your creativity with Fossify Voice Recorder. Download now and experience recording like never before.
+## Herkunft und Lizenz
 
-➡️ Explore more Fossify apps: https://www.fossify.org<br>
-➡️ Open-Source Code: https://www.github.com/FossifyOrg<br>
-➡️ Join the community on Reddit: https://www.reddit.com/r/Fossify<br>
-➡️ Connect on Telegram: https://t.me/Fossify
+Fork von [Fossify Voice Recorder](https://github.com/FossifyOrg/Voice-Recorder). Der Zweig `main` folgt dem Original, die Rosenweg-Anpassungen liegen im Zweig `rosenweg`. Herzlichen Dank an das Fossify-Team und alle Mitwirkenden für die solide Grundlage.
 
-<div align="center">
-<img alt="App image" src="fastlane/metadata/android/en-US/images/phoneScreenshots/1_en-US.png" width="30%">
-<img alt="App image" src="fastlane/metadata/android/en-US/images/phoneScreenshots/2_en-US.png" width="30%">
-<img alt="App image" src="fastlane/metadata/android/en-US/images/phoneScreenshots/3_en-US.png" width="30%">
-</div>
+Lizenz: GNU General Public License v3.0, siehe [LICENSE](LICENSE).
