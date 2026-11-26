@@ -1,0 +1,28 @@
+# Release automatisch nach dem Merge auf main: laeuft, sobald die CI auf main gruen ist.
+# Neue Version = VERSION_NAME in gradle.properties hochzaehlen. Gibt es v<VERSION_NAME> schon,
+# passiert nichts. Sonst: Release-APK bauen, mit dem Rosenweg-Schluessel signieren (Org-Secrets
+# ANDROID_KEYSTORE_BASE64, ANDROID_KEYSTORE_PASSWORD, ANDROID_KEY_ALIAS, ANDROID_KEY_PASSWORD),
+# Signatur pruefen, Release v<VERSION_NAME> anlegen und apps.yml starten (-> /apps).
+# Ohne Secrets endet der Lauf gruen mit Hinweis. Von Hand: gh workflow run release.yml
+# Mehr: Rosenweg/Website, .github/workflows/android-release.yml
+name: Release
+
+on:
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  actions: write
+  packages: read
+
+jobs:
+  release:
+    if: github.event_name == 'workflow_dispatch' || (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'push')
+    uses: Rosenweg/Website/.github/workflows/android-release.yml@main
+    with:
+      paket: ch.rosenweg4303.voicerecorder
+    secrets: inherit
