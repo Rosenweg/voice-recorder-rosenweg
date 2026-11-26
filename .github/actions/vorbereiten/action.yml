@@ -36,3 +36,15 @@ runs:
             }
         }
         GRADLE
+    # Plugins und Wrapper vorab holen, mit Wiederholung: bei vielen parallelen Jobs scheitert das
+    # Aufloesen der Gradle-Plugins gelegentlich am Netz ("Plugin ... was not found"). So bleibt rot
+    # fuer echte Fehler reserviert.
+    - name: Gradle vorbereiten (mit Wiederholung)
+      shell: bash
+      run: |
+        for i in 1 2 3; do
+          ./gradlew --quiet help && exit 0
+          echo "::warning::Gradle-Vorbereitung Versuch $i gescheitert, neuer Versuch in 30 s"
+          sleep 30
+        done
+        exit 1
