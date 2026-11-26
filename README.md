@@ -9,6 +9,7 @@
 - [Plattformen](#plattformen)
 - [Rechte und Gruppen](#rechte-und-gruppen)
 - [Bedienung](#bedienung)
+- [Anmeldung](#anmeldung)
 - [Rosenweg-Nextcloud](#rosenweg-nextcloud)
 - [Geteilte Rosenweg-Telefone](#geteilte-rosenweg-telefone)
 - [Rosenweg Updater](#rosenweg-updater)
@@ -47,7 +48,7 @@ Die App hat keine eigenen Rollen. Sie arbeitet mit dem Rosenweg-Konto der angeme
 | Wer | sieht und darf |
 |---|---|
 | Angemeldete Person | die eigene Rosenweg-Nextcloud, Arbeitsordner `Persönlich/Diktiergerät`; es gelten die Rechte der Nextcloud (auch für geteilte Ordner) |
-| Ohne Anmeldung | nur Dateien auf dem Telefon, wie im Original |
+| Ohne Anmeldung | auf dem eigenen Handy nicht nutzbar (siehe [Anmeldung](#anmeldung)) |
 | Technik | legt den Katalog-Eintrag `ch.rosenweg4303.voicerecorder` auf rosenweg4303.ch/smartphones an und bestimmt dort, für welche Gruppen die App auf den geteilten Telefonen erscheint |
 
 ## Bedienung
@@ -60,14 +61,29 @@ Die App hat keine eigenen Rollen. Sie arbeitet mit dem Rosenweg-Konto der angeme
 
 Ausführlich: [docs/anleitung.md](docs/anleitung.md).
 
+## Anmeldung
+
+Die App braucht eine Anmeldung; sie gilt nur für diese App.
+
+| Wo | So meldet man sich an |
+|---|---|
+| Eigenes Handy | beim Öffnen erscheint der gemeinsame Anmeldeschirm aus commons-rosenweg (Modul `anmeldeschirm`, wie der Sperrbildschirm der geteilten Telefone): Rosenweg-Karte per NFC hinten ans Handy halten **oder** „Mit Rosenweg-Konto anmelden“. Kein PIN – den gibt es nur auf geteilten Telefonen. |
+| Geteilte Rosenweg-Telefone | es gilt die Anmeldung von Rosenweg Gerät am Sperrbildschirm; kein eigener Anmeldeschirm |
+| Ohne Anmeldung | die App ist nicht nutzbar |
+| Mehrere Apps und Handys | jede Rosenweg-App meldet sich selbst an; bis zu 20 Sitzungen pro Person |
+| Abmelden | in der App; meldet nur diese App ab |
+
+**Stand:** Der gemeinsame Anmeldeschirm kommt mit PR #4 (commons-rosenweg Cloud 0.9.0). Bis dahin meldet man sich über „Anmelden“ in den Einstellungen direkt bei der Nextcloud im Browser an. PR #4 öffnet den Schirm über „Anmelden“; dass er beim Öffnen erscheint und die App ohne Anmeldung gesperrt ist, ist dort noch nicht eingebaut.
+
 ## Rosenweg-Nextcloud
 
 | Thema | So ist es |
 |---|---|
-| Anmeldung | über den Login der Nextcloud mit dem Rosenweg-Konto im Browser; die App erhält ein eigenes App-Passwort, nie das eigentliche Passwort |
-| Erster Start | die App fragt einmal, ob man sich anmelden möchte; „Nein, danke“ wird gemerkt, Anmelden geht weiter über die Einstellungen |
+| Zugang | nach der Anmeldung holt die App ihr eigenes Nextcloud-App-Passwort von der Telefonanlage, nie das eigentliche Passwort; geht das nicht, Login der Nextcloud im Browser. Auf geteilten Telefonen kommt der Zugang von Rosenweg Gerät. |
 | Hochladen | über eine Warteschlange, sobald Netz da ist; lokal gelöscht wird erst, wenn die Nextcloud den Empfang bestätigt hat |
 | Einstellungen pro Person | liegen in der Nextcloud der Person (`Persönlich/.rosenweg/`) und sind auf jedem Telefon wieder da, auf dem sie angemeldet ist. Gerätebezogenes (Widgets, Pfade, Zähler) bleibt auf dem Gerät. |
+
+Bisheriges Verhalten (bis PR #4): Anmeldung über den Login der Nextcloud mit dem Rosenweg-Konto im Browser; beim ersten Start fragt die App einmal, ob man sich anmelden möchte („Nein, danke“ wird gemerkt, Anmelden geht weiter über die Einstellungen).
 
 ## Geteilte Rosenweg-Telefone
 
