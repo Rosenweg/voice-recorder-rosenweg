@@ -1,0 +1,38 @@
+name: Vorbereiten (Java, Gradle, Rosenweg-Pakete)
+description: >-
+  JDK 17 und Gradle-Cache einrichten. Die Rosenweg-Bibliotheken (org.fossify:commons in der
+  Rosenweg-Fassung, ch.rosenweg4303:updater, :cloud, :anmeldeschirm) kommen in der CI aus
+  GitHub Packages von Rosenweg/commons-rosenweg - per Init-Skript, unabhaengig davon, ob die
+  settings.gradle.kts das Repo schon kennt (lokal bleibt mavenLocal bzw. gpr.user/gpr.key).
+  Braucht im Job permissions packages: read und die Env GITHUB_ACTOR/GITHUB_TOKEN.
+
+runs:
+  using: composite
+  steps:
+    - uses: actions/setup-java@de7274f081f381c8f8158605e0321c36c376e2e6
+      with:
+        java-version: 17
+        distribution: temurin
+    - uses: gradle/actions/setup-gradle@3f5f9adaf7d9fecd50b5935e54106014257a94e6
+    - name: Rosenweg-Pakete (GitHub Packages) fuer Gradle
+      shell: bash
+      run: |
+        mkdir -p ~/.gradle/init.d
+        cat > ~/.gradle/init.d/rosenweg-pakete.gradle <<'GRADLE'
+        beforeSettings { settings ->
+            settings.dependencyResolutionManagement.repositories {
+                maven {
+                    name = 'RosenwegPakete'
+                    url = 'https://maven.pkg.github.com/Rosenweg/commons-rosenweg'
+                    credentials {
+                        username = System.getenv('GITHUB_ACTOR')
+                        password = System.getenv('GITHUB_TOKEN')
+                    }
+                    content {
+                        includeGroup 'ch.rosenweg4303'
+                        includeModule 'org.fossify', 'commons'
+                    }
+                }
+            }
+        }
+        GRADLE
