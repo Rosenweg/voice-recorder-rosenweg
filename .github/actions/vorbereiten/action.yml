@@ -1,0 +1,91 @@
+name: Vorbereiten (Java, Gradle, Rosenweg-Pakete)
+description: >-
+  JDK 17 und Gradle-Cache einrichten; Maven Central ueber Googles Spiegel (GitHub-Runner
+  bekommen von repo.maven.apache.org oft HTTP 429). Die Rosenweg-Bibliotheken (org.fossify:commons in der
+  Rosenweg-Fassung, ch.rosenweg4303:updater, :cloud, :anmeldeschirm) kommen in der CI aus
+  GitHub Packages von Rosenweg/commons-rosenweg - per Init-Skript, unabhaengig davon, ob die
+  settings.gradle.kts das Repo schon kennt (lokal bleibt mavenLocal bzw. gpr.user/gpr.key).
+  Braucht im Job permissions packages: read und die Env GITHUB_ACTOR/GITHUB_TOKEN.
+
+runs:
+  using: composite
+  steps:
+    - uses: actions/setup-java@de7274f081f381c8f8158605e0321c36c376e2e6
+      with:
+        java-version: 17
+        distribution: temurin
+    - uses: gradle/actions/setup-gradle@3f5f9adaf7d9fecd50b5935e54106014257a94e6
+    - name: Rosenweg-Pakete (GitHub Packages) fuer Gradle
+      shell: bash
+      run: |
+        mkdir -p ~/.gradle/init.d
+        cat > ~/.gradle/init.d/rosenweg-pakete.gradle <<'GRADLE'
+        // Maven Central drosselt GitHub-Runner (HTTP 429), auch ueber den Umweg des Plugin-Portals.
+        // Deshalb zuerst Google und Googles offizieller Maven-Central-Spiegel.
+        def spiegel = { h ->
+            h.maven {
+                name = 'MavenCentralSpiegel'
+                url = 'https://maven-central.storage-download.googleapis.com/maven2/'
+                content {
+                    excludeGroup 'ch.rosenweg4303'
+                    excludeGroupByRegex 'androidx\\..*'
+                    excludeGroupByRegex 'com\\.android\\..*'
+                    excludeGroupByRegex 'com\\.google\\.android\\..*'
+                }
+            }
+        }
+        beforeSettings { settings ->
+            settings.pluginManagement.repositories { h ->
+                h.google()
+                spiegel(h)
+            }
+            settings.dependencyResolutionManagement.repositories { h ->
+                h.maven {
+                    name = 'RosenwegPakete'
+                    url = 'https://maven.pkg.github.com/Rosenweg/commons-rosenweg'
+                    credentials {
+                        username = System.getenv('GITHUB_ACTOR')
+                        password = System.getenv('GITHUB_TOKEN')
+                    }
+                    content {
+                        includeGroup 'ch.rosenweg4303'
+                        includeModule 'org.fossify', 'commons'
+                    }
+                }
+                spiegel(h)
+            }
+        }
+        // JitPack-Gruppen (com.github.*) und Rosenweg-Pakete nicht bei repo.maven.apache.org suchen:
+        // eine 429-Antwort auf die Suche bricht das Aufloesen ab. Was es von com.github.* wirklich
+        // auf Maven Central gibt (z.B. Glide), liefert der Spiegel, der vorher gefragt wird.
+        settingsEvaluated { settings ->
+            def filtern = { repos ->
+                repos.withType(MavenArtifactRepository).configureEach { r ->
+                    if (r.url.toString().contains('repo.maven.apache.org')) {
+                        r.content {
+                            excludeGroupByRegex 'com\\.github\\..*'
+                            excludeGroup 'ch.rosenweg4303'
+                        }
+                    }
+                }
+            }
+            filtern(settings.dependencyResolutionManagement.repositories)
+            filtern(settings.pluginManagement.repositories)
+        }
+        GRADLE
+    # Plugins und Wrapper vorab holen, mit Wiederholung: bei vielen parallelen Jobs scheitert das
+    # Aufloesen der Gradle-Plugins gelegentlich am Netz ("Plugin ... was not found"). So bleibt rot
+    # fuer echte Fehler reserviert.
+    - name: Gradle vorbereiten (mit Wiederholung)
+      shell: bash
+      run: |
+        extra=""
+        for i in 1 2 3 4; do
+          if ./gradlew --quiet $extra help > "$RUNNER_TEMP/gradle-vorbereiten.log" 2>&1; then exit 0; fi
+          grep -iE "could not (get|head|resolve)|status code|timed out|connect" "$RUNNER_TEMP/gradle-vorbereiten.log" | head -5 || true
+          echo "::warning::Gradle-Vorbereitung Versuch $i gescheitert, neuer Versuch in $((i * 30)) s"
+          sleep $((i * 30))
+          extra="--refresh-dependencies --info"
+        done
+        cat "$RUNNER_TEMP/gradle-vorbereiten.log" | tail -60
+        exit 1
