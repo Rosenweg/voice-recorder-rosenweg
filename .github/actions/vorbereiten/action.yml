@@ -42,9 +42,13 @@ runs:
     - name: Gradle vorbereiten (mit Wiederholung)
       shell: bash
       run: |
-        for i in 1 2 3; do
-          ./gradlew --quiet help && exit 0
-          echo "::warning::Gradle-Vorbereitung Versuch $i gescheitert, neuer Versuch in 30 s"
-          sleep 30
+        extra=""
+        for i in 1 2 3 4; do
+          if ./gradlew --quiet $extra help > "$RUNNER_TEMP/gradle-vorbereiten.log" 2>&1; then exit 0; fi
+          grep -iE "could not (get|head|resolve)|status code|timed out|connect" "$RUNNER_TEMP/gradle-vorbereiten.log" | head -5 || true
+          echo "::warning::Gradle-Vorbereitung Versuch $i gescheitert, neuer Versuch in $((i * 30)) s"
+          sleep $((i * 30))
+          extra="--refresh-dependencies --info"
         done
+        cat "$RUNNER_TEMP/gradle-vorbereiten.log" | tail -60
         exit 1
