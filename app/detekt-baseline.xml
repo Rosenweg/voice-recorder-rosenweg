@@ -16,6 +16,9 @@
     <ID>MagicNumber:ViewPagerAdapter.kt$ViewPagerAdapter$3</ID>
     <ID>MagicNumber:WidgetRecordDisplayConfigureActivity.kt$WidgetRecordDisplayConfigureActivity$100</ID>
     <ID>MaxLineLength:PlayerFragment.kt$PlayerFragment$if</ID>
+    <ID>MaxLineLength:RecorderService.kt$RecorderService$ch.rosenweg4303.cloud.Hochladen.einreihen(this, File(recordingPath), ziel, lokalLoeschen = true, mime = recordingPath.getMimeType())</ID>
+    <ID>MaxLineLength:RecorderService.kt$RecorderService$ch.rosenweg4303.cloud.Hochladen.einreihen(this, savedUri, ziel, lokalLoeschen = true, mime = recordingPath.getMimeType())</ID>
+    <ID>MaxLineLength:RecorderService.kt$RecorderService$if (File(recordingPath).length() &gt; 0) recordingSavedSuccessfully(resultUri ?: Uri.fromFile(File(recordingPath)))</ID>
     <ID>PrintStackTrace:Mp3Recorder.kt$Mp3Recorder$e</ID>
     <ID>SwallowedException:Context.kt$e: Exception</ID>
     <ID>TooGenericExceptionCaught:Activity.kt$e: Exception</ID>
@@ -23,6 +26,7 @@
     <ID>TooGenericExceptionCaught:Mp3Recorder.kt$Mp3Recorder$e: Exception</ID>
     <ID>TooGenericExceptionCaught:PlayerFragment.kt$PlayerFragment$e: Exception</ID>
     <ID>TooGenericExceptionCaught:RecorderService.kt$RecorderService$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:RecordingsAdapter.kt$RecordingsAdapter$e: Exception</ID>
     <ID>TooGenericExceptionCaught:RenameRecordingDialog.kt$RenameRecordingDialog$e: Exception</ID>
     <ID>TooManyFunctions:Activity.kt$org.fossify.voicerecorder.extensions.Activity.kt</ID>
     <ID>TooManyFunctions:Context.kt$org.fossify.voicerecorder.extensions.Context.kt</ID>
@@ -34,5 +38,6 @@
     <ID>TooManyFunctions:SettingsActivity.kt$SettingsActivity : SimpleActivity</ID>
     <ID>TooManyFunctions:TrashAdapter.kt$TrashAdapter : MyRecyclerViewAdapterOnPopupTextUpdate</ID>
     <ID>TooManyFunctions:TrashFragment.kt$TrashFragment : MyViewPagerFragmentRefreshRecordingsListener</ID>
+    <ID>UseCheckOrError:PlayerFragment.kt$PlayerFragment$throw IllegalStateException("Nicht an der Nextcloud angemeldet")</ID>
   </CurrentIssues>
 </SmellBaseline>
