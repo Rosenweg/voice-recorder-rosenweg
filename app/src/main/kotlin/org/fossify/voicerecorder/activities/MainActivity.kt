@@ -29,6 +29,7 @@ import org.fossify.voicerecorder.BuildConfig
 import org.fossify.voicerecorder.R
 import org.fossify.voicerecorder.adapters.ViewPagerAdapter
 import org.fossify.voicerecorder.databinding.ActivityMainBinding
+import org.fossify.voicerecorder.extensions.nutztSaf
 import org.fossify.voicerecorder.extensions.config
 import org.fossify.voicerecorder.extensions.deleteExpiredTrashedRecordings
 import org.fossify.voicerecorder.extensions.ensureStoragePermission
@@ -68,6 +69,10 @@ class MainActivity : SimpleActivity() {
         handlePermission(PERMISSION_RECORD_AUDIO) {
             if (it) {
                 tryInitVoiceRecorder()
+                // Rosenweg: beim ersten Start auf die Nextcloud hinweisen (ablehnen moeglich)
+                if (savedInstanceState == null) ch.rosenweg4303.cloud.Hinweis.beimErstenStart(this, "Deine Aufnahmen")
+                // Rosenweg: persoenliche Einstellungen aus der Nextcloud (und Aenderungen dorthin)
+                if (savedInstanceState == null) ch.rosenweg4303.cloud.Einstellungen.abgleichen(this) { recreate() }
             } else {
                 toast(org.fossify.commons.R.string.no_audio_permissions)
                 finish()
@@ -166,7 +171,10 @@ class MainActivity : SimpleActivity() {
     }
 
     private fun tryInitVoiceRecorder() {
-        if (isRPlus()) {
+        if (isRPlus() && !nutztSaf()) {
+            // Rosenweg: eigener App-Ordner, keine Freigabe noetig
+            setupViewPager()
+        } else if (isRPlus()) {
             ensureStoragePermission { granted ->
                 if (granted) {
                     setupViewPager()

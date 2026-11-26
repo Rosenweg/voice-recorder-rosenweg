@@ -28,6 +28,7 @@ import org.fossify.commons.helpers.isRPlus
 import org.fossify.voicerecorder.BuildConfig
 import org.fossify.voicerecorder.R
 import org.fossify.voicerecorder.activities.SplashActivity
+import org.fossify.voicerecorder.extensions.nutztSaf
 import org.fossify.voicerecorder.extensions.config
 import org.fossify.voicerecorder.extensions.getFormattedFilename
 import org.fossify.voicerecorder.extensions.updateWidgets
@@ -114,7 +115,7 @@ class RecorderService : Service() {
                 MediaRecorderWrapper(this)
             }
 
-            if (isRPlus()) {
+            if (nutztSaf(recordingPath)) {
                 val fileUri = createDocumentUriUsingFirstParentTreeUri(recordingPath)
                 createSAFFileSdk30(recordingPath)
                 resultUri = fileUri
@@ -194,7 +195,7 @@ class RecorderService : Service() {
         }
 
         recorder = null
-        if (isRPlus()) {
+        if (nutztSaf(recordingPath)) {
             val recordingUri = createDocumentUriUsingFirstParentTreeUri(recordingPath)
             DocumentsContract.deleteDocument(contentResolver, recordingUri)
         } else {
@@ -236,6 +237,11 @@ class RecorderService : Service() {
     }
 
     private fun scanRecording() {
+        if (!nutztSaf(recordingPath)) {
+            // Rosenweg: eigener App-Ordner - nicht in die Mediathek, direkt weiter
+            if (File(recordingPath).length() > 0) recordingSavedSuccessfully(resultUri ?: Uri.fromFile(File(recordingPath)))
+            return
+        }
         MediaScannerConnection.scanFile(
             this,
             arrayOf(recordingPath),
@@ -252,6 +258,19 @@ class RecorderService : Service() {
 
     private fun recordingSavedSuccessfully(savedUri: Uri) {
         toast(R.string.recording_saved_successfully)
+        // Rosenweg: Aufnahme in den persoenlichen Ordner der Nextcloud (Persönlich/Diktiergerät/<Monat>).
+        // Ohne Anmeldung wartet sie in der Warteschlange. Grundregel: lokal geloescht wird
+        // erst, wenn die Nextcloud den Empfang bestaetigt hat (Entscheid Stefan 24.11.2026).
+        try {
+            val ziel = ch.rosenweg4303.cloud.Hochladen.ziel("Diktiergerät", recordingPath.getFilenameFromPath())
+            if (!nutztSaf(recordingPath)) {
+                ch.rosenweg4303.cloud.Hochladen.einreihen(this, File(recordingPath), ziel, lokalLoeschen = true, mime = recordingPath.getMimeType())
+            } else {
+                ch.rosenweg4303.cloud.Hochladen.einreihen(this, savedUri, ziel, lokalLoeschen = true, mime = recordingPath.getMimeType())
+            }
+        } catch (e: Exception) {
+            showErrorToast(e)
+        }
         EventBus.getDefault().post(Events.RecordingSaved(savedUri))
     }
 

@@ -1,5 +1,7 @@
 package org.fossify.voicerecorder.dialogs
 
+import org.fossify.voicerecorder.extensions.nextcloudUmbenennen
+import org.fossify.voicerecorder.extensions.istNextcloud
 import androidx.appcompat.app.AlertDialog
 import org.fossify.commons.activities.BaseSimpleActivity
 import org.fossify.commons.extensions.getAlertDialogBuilder
@@ -16,6 +18,7 @@ import org.fossify.commons.extensions.value
 import org.fossify.commons.helpers.ensureBackgroundThread
 import org.fossify.commons.helpers.isRPlus
 import org.fossify.voicerecorder.databinding.DialogRenameRecordingBinding
+import org.fossify.voicerecorder.extensions.nutztSaf
 import org.fossify.voicerecorder.extensions.config
 import org.fossify.voicerecorder.models.Events
 import org.fossify.voicerecorder.models.Recording
@@ -56,7 +59,13 @@ class RenameRecordingDialog(
                         }
 
                         ensureBackgroundThread {
-                            if (isRPlus()) {
+                            if (recording.istNextcloud) {
+                                try {
+                                    activity.nextcloudUmbenennen(recording, newTitle)
+                                } catch (e: Exception) {
+                                    activity.showErrorToast(e)
+                                }
+                            } else if (activity.nutztSaf()) {
                                 renameRecording(recording, newTitle)
                             } else {
                                 renameRecordingLegacy(recording, newTitle)

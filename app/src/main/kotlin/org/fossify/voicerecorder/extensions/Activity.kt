@@ -1,5 +1,6 @@
 package org.fossify.voicerecorder.extensions
 
+import org.fossify.commons.extensions.showErrorToast
 import android.app.Activity
 import android.provider.DocumentsContract
 import android.view.WindowManager
@@ -30,7 +31,7 @@ fun Activity.setKeepScreenAwake(keepScreenOn: Boolean) {
 }
 
 fun BaseSimpleActivity.ensureStoragePermission(callback: (result: Boolean) -> Unit) {
-    if (isRPlus() && !hasProperStoredFirstParentUri(config.saveRecordingsFolder)) {
+    if (nutztSaf() && !hasProperStoredFirstParentUri(config.saveRecordingsFolder)) {
         StoragePermissionDialog(this) {
             launchFolderPicker(config.saveRecordingsFolder) { newPath ->
                 if (!newPath.isNullOrEmpty()) {
@@ -80,13 +81,22 @@ fun BaseSimpleActivity.deleteRecordings(
     callback: (success: Boolean) -> Unit
 ) {
     ensureBackgroundThread {
-        if (isRPlus()) {
+        // Rosenweg: Nextcloud-Aufnahmen dort loeschen (Papierkorb der Nextcloud)
+        try {
+            nextcloudLoeschen(recordingsToRemove)
+        } catch (e: Exception) {
+            showErrorToast(e)
+            callback(false)
+            return@ensureBackgroundThread
+        }
+        val lokal = recordingsToRemove.filterNot { it.istNextcloud }
+        if (nutztSaf()) {
             val resolver = contentResolver
-            recordingsToRemove.forEach {
+            lokal.forEach {
                 DocumentsContract.deleteDocument(resolver, it.path.toUri())
             }
         } else {
-            recordingsToRemove.forEach {
+            lokal.forEach {
                 val fileDirItem = File(it.path).toFileDirItem(this)
                 deleteFile(fileDirItem)
             }
@@ -122,7 +132,24 @@ fun BaseSimpleActivity.moveRecordings(
     destinationParent: String,
     callback: (success: Boolean) -> Unit
 ) {
-    if (isRPlus()) {
+    // Rosenweg: Nextcloud-Aufnahmen gehen in den Papierkorb der Nextcloud
+    val oben = recordingsToMove.filter { it.istNextcloud }
+    if (oben.isNotEmpty()) {
+        try {
+            nextcloudLoeschen(oben)
+        } catch (e: Exception) {
+            showErrorToast(e)
+            callback(false)
+            return
+        }
+        val rest = recordingsToMove.filterNot { it.istNextcloud }
+        if (rest.isEmpty()) {
+            callback(true)
+            return
+        }
+        return moveRecordings(rest, sourceParent, destinationParent, callback)
+    }
+    if (nutztSaf(sourceParent)) {
         moveRecordingsSAF(
             recordings = recordingsToMove,
             sourceParent = sourceParent,

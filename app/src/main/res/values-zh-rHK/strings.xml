@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_launcher_name">錄音機</string>
+    <string name="app_launcher_name">Rosenweg 錄音機</string>
     <string name="confirm_recording_folder">您必須確認儲存錄音的資料夾。請按「確定」繼續。</string>
     <string name="move_recordings">移動錄音</string>
     <string name="move_recordings_to_new_folder_desc">您已有現存的錄音，要將它們移至新資料夾嗎？</string>

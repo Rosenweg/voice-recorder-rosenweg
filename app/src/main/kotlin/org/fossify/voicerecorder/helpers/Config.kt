@@ -14,7 +14,9 @@ class Config(context: Context) : BaseConfig(context) {
     }
 
     var saveRecordingsFolder: String
-        get() = prefs.getString(SAVE_RECORDINGS, context.getDefaultRecordingsFolder())!!
+        // Rosenweg: fest vorgegeben (eigener App-Ordner), keine Auswahl, keine Freigabe.
+        // Aufnahmen gehen in die Nextcloud (Persönlich/Diktiergerät) und werden danach geloescht.
+        get() = context.getDefaultRecordingsFolder()
         set(saveRecordingsFolder) = prefs.edit().putString(SAVE_RECORDINGS, saveRecordingsFolder)
             .apply()
 

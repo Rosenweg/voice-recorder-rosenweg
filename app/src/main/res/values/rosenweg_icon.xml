@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Erzeugt von rosenweg-basis werkzeug/logo/erzeugen.sh -->
+<resources>
+    <color name="rosenweg_icon_background">#D32F2F</color>
+    <!-- Fossify: waehlbare Icon-Farben; alle zeigen auf das Rosenweg-Icon -->
+    <item name="ic_launcher_red" type="mipmap">@mipmap/ic_launcher</item>
+    <item name="ic_launcher_pink" type="mipmap">@mipmap/ic_launcher</item>
+    <item name="ic_launcher_purple" type="mipmap">@mipmap/ic_launcher</item>
+    <item name="ic_launcher_deep_purple" type="mipmap">@mipmap/ic_launcher</item>
+    <item name="ic_launcher_indigo" type="mipmap">@mipmap/ic_launcher</item>
+    <item name="ic_launcher_blue" type="mipmap">@mipmap/ic_launcher</item>
+    <item name="ic_launcher_light_blue" type="mipmap">@mipmap/ic_launcher</item>
+    <item name="ic_launcher_cyan" type="mipmap">@mipmap/ic_launcher</item>
+    <item name="ic_launcher_teal" type="mipmap">@mipmap/ic_launcher</item>
+    <item name="ic_launcher_light_green" type="mipmap">@mipmap/ic_launcher</item>
+    <item name="ic_launcher_lime" type="mipmap">@mipmap/ic_launcher</item>
+    <item name="ic_launcher_yellow" type="mipmap">@mipmap/ic_launcher</item>
+    <item name="ic_launcher_amber" type="mipmap">@mipmap/ic_launcher</item>
+    <item name="ic_launcher_orange" type="mipmap">@mipmap/ic_launcher</item>
+    <item name="ic_launcher_deep_orange" type="mipmap">@mipmap/ic_launcher</item>
+    <item name="ic_launcher_brown" type="mipmap">@mipmap/ic_launcher</item>
+    <item name="ic_launcher_blue_grey" type="mipmap">@mipmap/ic_launcher</item>
+    <item name="ic_launcher_grey_black" type="mipmap">@mipmap/ic_launcher</item>
+</resources>

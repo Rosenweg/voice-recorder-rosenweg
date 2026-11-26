@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_launcher_name">錄音機</string>
+    <string name="app_launcher_name">Rosenweg 錄音機</string>
     <string name="recording_saved_successfully">已成功儲存錄音</string>
     <string name="recording">錄音中</string>
     <string name="no_recordings_found">未找到由此應用程式\n建立的錄音</string>

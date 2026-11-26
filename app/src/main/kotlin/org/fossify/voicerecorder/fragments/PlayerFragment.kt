@@ -1,5 +1,7 @@
 package org.fossify.voicerecorder.fragments
 
+import org.fossify.voicerecorder.extensions.ncPfad
+import org.fossify.voicerecorder.extensions.istNextcloud
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Context.RECEIVER_NOT_EXPORTED
@@ -235,6 +237,11 @@ class PlayerFragment(
             }
 
             setOnPreparedListener {
+                // Rosenweg: Dauer von Nextcloud-Aufnahmen kennt erst der Player
+                if (binding.playerProgressbar.max == 0 && it.duration > 0) {
+                    binding.playerProgressbar.max = it.duration / 1000
+                    binding.playerProgressMax.text = (it.duration / 1000).getFormattedDuration()
+                }
                 if (playOnPreparation) {
                     resumePlayback()
                 }
@@ -245,6 +252,11 @@ class PlayerFragment(
     }
 
     override fun playRecording(recording: Recording, playOnPrepared: Boolean) {
+        // Rosenweg: lokale Datei inzwischen hochgeladen und geloescht -> Liste neu (dann aus der Nextcloud)
+        if (!recording.istNextcloud && recording.path.startsWith("/") && !java.io.File(recording.path).exists()) {
+            loadRecordings()
+            return
+        }
         resetProgress(recording)
         (binding.recordingsList.adapter as RecordingsAdapter).updateCurrentRecording(recording.id)
         playOnPreparation = playOnPrepared
@@ -253,7 +265,14 @@ class PlayerFragment(
             reset()
 
             try {
-                setDataSource(context, recording.path.toUri())
+                if (recording.istNextcloud) {
+                    // Rosenweg: direkt aus der Nextcloud streamen
+                    val (uri, kopf) = ch.rosenweg4303.cloud.Ablage.streamen(context, recording.ncPfad)
+                        ?: throw IllegalStateException("Nicht an der Nextcloud angemeldet")
+                    setDataSource(context, uri, kopf)
+                } else {
+                    setDataSource(context, recording.path.toUri())
+                }
             } catch (e: Exception) {
                 context?.showErrorToast(e)
                 return
