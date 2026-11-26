@@ -1,0 +1,28 @@
+# Releases an www.rosenweg4303.ch/apps und den App-Katalog der geteilten Telefone schicken.
+#
+# Release-Schritt: APK lokal mit dem Rosenweg-Schluessel bauen, dann
+#   gh release create v<versionName> <datei.apk> --notes "Was ist neu"
+# Der Tag muss dem versionName der APK entsprechen (mit oder ohne v), eine APK je Release.
+# Erneut senden (z.B. nach einer Stoerung): gh workflow run apps.yml --ref <tag>
+#
+# Anmeldung bei der Anlage mit dem OIDC-Token von GitHub Actions (kein Geheimnis). Die Anlage
+# prueft Repo, Tag, Pruefsumme, Rosenweg-Signatur und Paketnamen und ersetzt die APK im Katalog;
+# die App muss dort (rosenweg4303.ch/smartphones) schon stehen.
+# Mehr: Rosenweg/Website, pbx/README.md, Abschnitt "Seite /apps und App-Releases".
+name: Auf /apps
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  apps:
+    uses: Rosenweg/Website/.github/workflows/apps-release.yml@main
+    with:
+      paket: ch.rosenweg4303.voicerecorder
+      muster: '*.apk'
