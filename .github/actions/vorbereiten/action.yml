@@ -1,6 +1,7 @@
 name: Vorbereiten (Java, Gradle, Rosenweg-Pakete)
 description: >-
-  JDK 17 und Gradle-Cache einrichten. Die Rosenweg-Bibliotheken (org.fossify:commons in der
+  JDK 17 und Gradle-Cache einrichten; Maven Central ueber Googles Spiegel (GitHub-Runner
+  bekommen von repo.maven.apache.org oft HTTP 429). Die Rosenweg-Bibliotheken (org.fossify:commons in der
   Rosenweg-Fassung, ch.rosenweg4303:updater, :cloud, :anmeldeschirm) kommen in der CI aus
   GitHub Packages von Rosenweg/commons-rosenweg - per Init-Skript, unabhaengig davon, ob die
   settings.gradle.kts das Repo schon kennt (lokal bleibt mavenLocal bzw. gpr.user/gpr.key).
@@ -19,9 +20,26 @@ runs:
       run: |
         mkdir -p ~/.gradle/init.d
         cat > ~/.gradle/init.d/rosenweg-pakete.gradle <<'GRADLE'
+        // Maven Central drosselt GitHub-Runner (HTTP 429), auch ueber den Umweg des Plugin-Portals.
+        // Deshalb zuerst Google und Googles offizieller Maven-Central-Spiegel.
+        def spiegel = { h ->
+            h.maven {
+                name = 'MavenCentralSpiegel'
+                url = 'https://maven-central.storage-download.googleapis.com/maven2/'
+                content {
+                    excludeGroupByRegex 'androidx\\..*'
+                    excludeGroupByRegex 'com\\.android\\..*'
+                    excludeGroupByRegex 'com\\.google\\.android\\..*'
+                }
+            }
+        }
         beforeSettings { settings ->
-            settings.dependencyResolutionManagement.repositories {
-                maven {
+            settings.pluginManagement.repositories { h ->
+                h.google()
+                spiegel(h)
+            }
+            settings.dependencyResolutionManagement.repositories { h ->
+                h.maven {
                     name = 'RosenwegPakete'
                     url = 'https://maven.pkg.github.com/Rosenweg/commons-rosenweg'
                     credentials {
@@ -33,6 +51,7 @@ runs:
                         includeModule 'org.fossify', 'commons'
                     }
                 }
+                spiegel(h)
             }
         }
         GRADLE
