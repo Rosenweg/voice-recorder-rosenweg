@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Erzeugt von rosenweg-basis werkzeug/logo/erzeugen.sh -->
 <resources>
-    <color name="rosenweg_icon_background">#D32F2F</color>
+    <color name="rosenweg_icon_background">#D62828</color>
     <!-- Fossify: waehlbare Icon-Farben; alle zeigen auf das Rosenweg-Icon -->
     <item name="ic_launcher_red" type="mipmap">@mipmap/ic_launcher</item>
     <item name="ic_launcher_pink" type="mipmap">@mipmap/ic_launcher</item>
