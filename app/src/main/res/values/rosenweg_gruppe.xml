@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Farbe des Anmeldeschirms wie der Logo-Grund (commons-rosenweg cloud ab 0.13.6): bewohner | verwaltung | technik -->
+    <string name="rosenweg_gruppe" translatable="false">bewohner</string>
+</resources>
