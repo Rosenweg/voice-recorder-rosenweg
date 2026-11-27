@@ -232,6 +232,30 @@
 
             </RelativeLayout>
 
+            <!-- Rosenweg Updater: sofort pruefen (RosenwegUpdater.jetztPruefen) -->
+            <RelativeLayout
+                android:id="@+id/settings_rw_updates_holder"
+                style="@style/SettingsHolderTextViewStyle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <org.fossify.commons.views.MyTextView
+                    android:id="@+id/settings_rw_updates_label"
+                    style="@style/SettingsTextLabelStyle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/rosenweg_nach_updates_suchen" />
+
+                <org.fossify.commons.views.MyTextView
+                    android:id="@+id/settings_rw_updates"
+                    style="@style/SettingsTextValueStyle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/settings_rw_updates_label"
+                    android:text="@string/rosenweg_nach_updates_suchen_text" />
+
+            </RelativeLayout>
+
             <RelativeLayout
                 android:id="@+id/settings_filename_pattern_holder"
                 style="@style/SettingsHolderTextViewStyle"
