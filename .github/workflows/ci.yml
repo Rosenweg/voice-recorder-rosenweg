@@ -29,8 +29,17 @@ env:
   LINT: ":app:lintFossDebug"
 
 jobs:
+  # Runner-Wahl (Rosenweg/rosenweg-basis, runner-wahl.yml): privat immer eigene,
+  # oeffentlich eigene wenn frei oder zuschaltbar, Forks nie. macOS bleibt bei GitHub.
+  wahl:
+    uses: Rosenweg/rosenweg-basis/.github/workflows/runner-wahl.yml@main
+    secrets:
+      PAKETE_APP_ID: ${{ secrets.PAKETE_APP_ID }}
+      PAKETE_APP_KEY: ${{ secrets.PAKETE_APP_KEY }}
+
   changes:
-    runs-on: ubuntu-latest
+    runs-on: ${{ fromJSON(needs.wahl.outputs.linux) }}
+    needs: wahl
     outputs:
       run_ci: ${{ github.event_name != 'pull_request' || steps.filter.outputs.code == 'true' }}
     steps:
@@ -49,18 +58,18 @@ jobs:
               - '!LICENSE'
 
   wrapper-validation:
-    needs: changes
+    needs: [changes, wahl]
     if: needs.changes.outputs.run_ci == 'true'
-    runs-on: ubuntu-latest
+    runs-on: ${{ fromJSON(needs.wahl.outputs.linux) }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
       - uses: gradle/actions/wrapper-validation@3f5f9adaf7d9fecd50b5935e54106014257a94e6
 
   build:
     name: build + test
-    needs: [changes, wrapper-validation]
+    needs: [changes, wrapper-validation, wahl]
     if: needs.changes.outputs.run_ci == 'true'
-    runs-on: ubuntu-latest
+    runs-on: ${{ fromJSON(needs.wahl.outputs.linux) }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
       - uses: ./.github/actions/vorbereiten
@@ -77,9 +86,9 @@ jobs:
           if-no-files-found: ignore
 
   lint:
-    needs: [changes, wrapper-validation]
+    needs: [changes, wrapper-validation, wahl]
     if: needs.changes.outputs.run_ci == 'true'
-    runs-on: ubuntu-latest
+    runs-on: ${{ fromJSON(needs.wahl.outputs.linux) }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
       - uses: ./.github/actions/vorbereiten
@@ -94,9 +103,9 @@ jobs:
           if-no-files-found: ignore
 
   detekt:
-    needs: [changes, wrapper-validation]
+    needs: [changes, wrapper-validation, wahl]
     if: needs.changes.outputs.run_ci == 'true'
-    runs-on: ubuntu-latest
+    runs-on: ${{ fromJSON(needs.wahl.outputs.linux) }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
       - uses: ./.github/actions/vorbereiten
@@ -120,8 +129,8 @@ jobs:
 
   ci-gate:
     if: always()
-    runs-on: ubuntu-latest
-    needs: [changes, wrapper-validation, build, lint, detekt]
+    runs-on: ${{ fromJSON(needs.wahl.outputs.linux) }}
+    needs: [changes, wrapper-validation, build, lint, detekt, wahl]
     steps:
       - name: Alle Pruefungen gruen?
         run: |
